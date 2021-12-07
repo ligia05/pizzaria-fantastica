@@ -1,5 +1,6 @@
 const { application } = require('express');
 const pizzas = require('../database/Pizzas.json')
+const fs= require ('fs')
 const controller = {
     listar: (req, res) => {
         return res.render('index', { pizzas, busca: "" });
@@ -22,7 +23,27 @@ const controller = {
 
 
         res.render('index', { pizzas: pizzasFiltradas, busca: stringPizzas });
-    }
-}
+    },
+    create: (req,res) =>{
 
+  res.render("crud-pizzas/create")
+    },
+store: (req,res)=>{
+    const nome= req.body.nome;
+    const ingredientes = req.body.ingredientes.split(",").map(a => a.trim());
+    const preco = req.body.preco;
+    const pizza = {nome, ingredientes,preco, img:'/img/'+ req.file.filename}
+  pizza.id = pizzas[pizzas.length-1].id + 1;
+  
+  pizzas.push(pizza);
+  
+  fs.writeFileSync(__dirname +'/../database/Pizzas.json',
+   JSON.stringify(pizzas,null,4)),{flag:'w'}
+
+  
+  
+    res.redirect('/');
+
+}
+}
 module.exports = controller;
